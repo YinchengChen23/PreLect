@@ -318,7 +318,6 @@ class ADlasso():
             raise ValueError("The folder you assigned does not exist.")
 
         classes = {v: k for k, v in self.classes_.items()}
-        outpath = outpath + '.txt'
         w = open(outpath,'w')
         for ix, wi in enumerate(self.w):
             if wi != 0:
