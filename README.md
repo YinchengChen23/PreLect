@@ -297,7 +297,14 @@ array([1.00000000e-08, 1.26485522e-08, 1.59985872e-08, 2.02358965e-08,
 lambda_tuning_viz(result_dict, metric, savepath=None, fig_width=8, fig_height=4)
 
 
-
+<figure class='second'>
+  <img src='https://github.com/YinchengChen23/ADlasso/blob/main/img/img2.png?raw=true' width='300'/>
+  <img src='https://github.com/YinchengChen23/ADlasso/blob/main/img/img3.png?raw=true' width='300'/>
+</figure>
+<figure class='second'>
+  <img src='https://github.com/YinchengChen23/ADlasso/blob/main/img/img4.png?raw=true' width='300'/>
+  <img src='https://github.com/YinchengChen23/ADlasso/blob/main/img/img5.png?raw=true' width='300'/>
+</figure>
 
 
 
