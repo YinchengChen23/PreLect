@@ -236,25 +236,39 @@ Automatically generates a list of feature selections.
 
 ## Lambda tuning
 
-Unlike the common strategies of parameters tuning (based on performance), here we propose a method to determine the parameter according to the variation of loss value. We observe that the number of selected features gradually decreases as lambda intensity from weak to strong, as shown below.
+Unlike the common strategies for parameters tuning (based on performance), Here we propose a method to determine the parameter according to the variation of loss value. We observe that the number of selected features gradually decreases as lambda intensity from weak to strong, as shown below.
 ![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img1.png?raw=true)
-We design a function `auto_scale` which can automatically scan the lambda from $10^{-10}$ to 1, and identify the upper and lower boundaries 
+We design a function `auto_scale` which can automatically scan the lambda from $10^{-10}$ to $1$, and identify the upper and lower boundaries representing lasso start filtering and lasso drop all features respectively (black dotted line). 
 
+`auto_scale(X_input, X_raw, Y, step=50, device='cpu', training_echo=False, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8)`
 
+|                 |                                                                    |
+|-----------------|--------------------------------------------------------------------|
+| **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **step : *Integer*** <br> split into k parts within upper and lower bounds as examining lambda.  <br> <br> **other prarameters : the basic seting in `ADlasso` class**  |
+| **Returns:**    | **log_lmbd_range : *np-array of shape (n_steps,)*** <br> The vector of examining lambda. |
 
+Afterwards, we performed a k-fold cross validation (CV) for examining each lambda via function `lambda_tuning`, the metrics which including area under curve of Precision Recall Curve (PRC), Matthews Correlation Coefficient (MCC), minimal error and minimal Binary Cross Entropy loss (BCE) were evaluate in each examining lambda. Since this procedure is time consuming, we suggest running it with `nohup`, and we provide a `outdir` option to output the results to the folder you specify.
+
+`lambda_tuning(X_input, X_raw, Y, lmbdrange, k_fold, outdir, device='cpu', training_echo=False, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8)` 
+
+|                 |                                                                    |
+|-----------------|--------------------------------------------------------------------|
+| **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **lmbdrange : *np-array of shape (n_steps,)*** <br>  examining lambda vector. <br> <br> **k_fold : *Integer*** <br> split data into k parts for cross validation. <br> <br>  **outdir : *String*** <br>  Absolute pathoutput of folder  <br> <br> **other prarameters : the basic seting in `ADlasso` class**  |
+| **Returns:**    | **metrics_dict : *dict*** <br>  {'Percentage', 'Prevalence', 'Feature_number', 'AUC', 'AUPR', 'MCC', 'loss_history', 'error_history', 'pairwiseMCC'}. |
+
+As mentioned above, we also provide a function `get_tuning_result` to get the result from output folder, if you conduct `lambda_tuning` via `nohup`.
+
+`get_tuning_result(result_path)`
+
+|                 |                                                                      |
+|-----------------|----------------------------------------------------------------------|
+| **Parameters:** | **result_path : *String*** <br> Absolute pathoutput of result folder.|
+| **Returns:**    | **metrics_dict : *dict*** <br>  {'Percentage', 'Prevalence', 'Feature_number', 'AUC', 'AUPR', 'MCC', 'loss_history', 'error_history', 'pairwiseMCC'}. |
+
+#### Examples
 ```python
->>> log_lmbd_range = auto_scale(Data_std, RawData, Label, step=50, training_echo=True)
-minimum epoch =  9999 ; minimum lost =  1.2859813978138845e-05 ; diff weight =  0.0007397268782369792
-minimum epoch =  9998 ; minimum lost =  1.2966416761628352e-05 ; diff weight =  0.0007312815869227052
-minimum epoch =  9997 ; minimum lost =  1.4026709322934039e-05 ; diff weight =  0.0008005526033230126
-minimum epoch =  9998 ; minimum lost =  1.9292663637315854e-05 ; diff weight =  0.0010228692553937435
-minimum epoch =  9998 ; minimum lost =  4.899652412859723e-05 ; diff weight =  0.002119753509759903
-minimum epoch =  9999 ; minimum lost =  0.00014952411584090441 ; diff weight =  0.0025313219521194696
-minimum epoch =  9999 ; minimum lost =  0.0006481666350737214 ; diff weight =  0.0024026762694120407
-minimum epoch =  428 ; minimum lost =  0.6732618808746338 ; diff weight =  8.982419967651367e-05
-minimum epoch =  428 ; minimum lost =  0.6745402812957764 ; diff weight =  8.842349052429199e-05
-minimum epoch =  428 ; minimum lost =  0.6745402812957764 ; diff weight =  8.842349052429199e-05
-minimum epoch =  428 ; minimum lost =  0.6745402812957764 ; diff weight =  8.842349052429199e-05
+>>> log_lmbd_range = auto_scale(Data_std, RawData, Label, step=50)
+
 >>> lmbd_range = np.exp(log_lmbd_range)
 >>> print(lmbd_range)
 array([1.00000000e-08, 1.26485522e-08, 1.59985872e-08, 2.02358965e-08,
@@ -270,7 +284,22 @@ array([1.00000000e-08, 1.26485522e-08, 1.59985872e-08, 2.02358965e-08,
        1.20679264e-04, 1.52641797e-04, 1.93069773e-04, 2.44205309e-04,
        3.08884360e-04, 3.90693994e-04, 4.94171336e-04, 6.25055193e-04,
        7.90604321e-04, 1.00000000e-03])
+
+>>> k_fold = 5
+>>> outPath_dataSet = '/home/yincheng23/ADlasso/data/crc_zeller/LmbdTuning'
+>>> result_dict =lambda_tuning(Data_std, RawData, Label, lmbd_range, k_fold, outPath_dataSet)
+
+>>> result_dict_recell = get_tuning_result(outPath_dataSet)
 ```
+
+
+
+lambda_tuning_viz(result_dict, metric, savepath=None, fig_width=8, fig_height=4)
+
+
+
+
+
 
 
 
