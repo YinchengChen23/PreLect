@@ -360,5 +360,5 @@ def featureProperty(X, y, AD_object):
     class1Pvl = get_prevalence(X_, class1Idx)
     C0head = 'prevalence_' + str(list(AD_object.classes_.keys())[0])
     C1head = 'prevalence_' + str(list(AD_object.classes_.keys())[1])
-    plotdf = pd.DataFrame({'meanAbundance' : RA,'Variance' : Var, 'select' : selection, 'prevalence' : pvl, C0head : class0Pvl, C1head : class1Pvl})
+    plotdf = pd.DataFrame({'meanAbundance' : RA,'Variance' : Var, 'select' : selection, 'prevalence' : wholePvl, C0head : class0Pvl, C1head : class1Pvl})
     return plotdf
