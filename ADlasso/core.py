@@ -191,7 +191,7 @@ class ADlasso():
             prev_w = current_w
             current_w, current_v = self.proximal_GD(X, Xt, y, current_w, current_v, prevalence, thres)
             lossvalue = self.BCE(self.sigmoid(X.mm(current_w)), y).item()
-            diff_w = torch.sum(torch.abs(current_w - prev_w))
+            diff_w = torch.sqrt_(torch.sum(torch.square_(current_w - prev_w)))
             if diff_w <= self.tol:
                 mini_iter = i; mini_loss = lossvalue; mini_diff = diff_w; best_w = current_w
                 break
