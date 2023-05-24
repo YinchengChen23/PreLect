@@ -357,7 +357,7 @@ We recommend determining the optimal lambda value based on the inflection point 
 >>> pvl = get_prevalence(RawData, np.arange(RawData.shape[0]))
 >>> opt_res = ADlasso(lmbd = opt_lmbd, echo= True)
 >>> start = time.time()
->>> res.fit(Data_std, Label, pvl)
+>>> opt_res.fit(Data_std, Label, pvl)
 minimum epoch =  9999 ; minimum lost =  0.00022168313444126397 ; diff weight =  0.002862341469153762
 >>> end = time.time()
 >>> print('median of prevalence :',np.median([pvl[i]  for i, w in enumerate(opt_res.feature_set) if w != 0]))
