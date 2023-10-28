@@ -339,9 +339,9 @@ We also retrain a logistic classifier with the selected features, and test it wi
 >>> Fig.savefig(outputPath)
 ```
 
-We recommend determining the optimal lambda value based on the inflection point of the BCE loss curve. This point marks the crucial balance where the regularization term outweighs the loss term. So we designed a function `lambda_decision` to find the inflection point by slicing the BCE loss curve into `k` part via segemented regression.
+We recommend determining the optimal lambda value based on the inflection point of the BCE loss curve. This point marks the crucial balance where the regularization term outweighs the loss term. So we designed a function `LambdaDecision` to find the inflection point by slicing the BCE loss curve into `k` part via segemented regression.
 
-`lambda_decision(result_dict, k, savepath=None, fig_width=8, fig_height=4)`
+`LambdaDecision(result_dict, k, savepath=None, fig_width=8, fig_height=4)`
 
 |                 |                                                                      |
 |-----------------|----------------------------------------------------------------------|
@@ -350,7 +350,7 @@ We recommend determining the optimal lambda value based on the inflection point 
 
 ```python
 >>> outputPath = '/home/yincheng23/PreLect/img/img2.png'
->>> opt_lmbd, fig = lambda_decision(result_dict_recell, 5)
+>>> opt_lmbd, fig = LambdaDecision(result_dict_recell, 5)
 >>> print(opt_lmbd)
 1.4563484775012424e-05
 
