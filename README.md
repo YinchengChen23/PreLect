@@ -242,25 +242,25 @@ Automatically generates a list of feature selections.
 
 Unlike the common strategies for parameters tuning (based on performance), Here, we propose a method to determine the parameter according to the variation of loss value. We observe that the number of selected features gradually decreases as lambda intensity from weak to strong, as shown below.
 ![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img1.png?raw=true)
-So we design a function `auto_scale` which can automatically scan the lambda from $10^{-10}$ to $1$, and identify the upper and lower boundaries representing lasso start filtering and lasso drop all features respectively (black dotted line). And divide `k` parts whitin this region as the examining lambdas.
+So we design a function `AutoScanning` which can automatically scan the lambda from $10^{-10}$ to $1$, and identify the upper and lower boundaries representing lasso start filtering and lasso drop all features respectively (black dotted line). And divide `k` parts whitin this region as the examining lambdas.
 
-`auto_scale(X_input, X_raw, Y, step=50, device='cpu', training_echo=False, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8)`
+`AutoScanning(X_input, X_raw, Y, step=50, device='cpu', training_echo=False, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8)`
 
 |                 |                                                                    |
 |-----------------|--------------------------------------------------------------------|
 | **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **step : *Integer*** <br> split into k parts within upper and lower bounds as examining lambda.  <br> <br> **other prarameters : the basic seting in `PreLect` class**  |
 | **Returns:**    | **log_lmbd_range : *np-array of shape (n_steps,)*** <br> The vector of examining lambda. |
 
-Afterwards, we performed a k-fold cross validation (CV) for examining each lambda via function `lambda_tuning`, the metrics which including area under curve of Precision Recall Curve (PRC), Matthews Correlation Coefficient (MCC), minimal error and minimal Binary Cross Entropy loss (BCE) were evaluate in each examining lambda. Since this procedure is time consuming, we suggest running it with `nohup`, and we provide a `outdir` option to save the results to the folder you specify.
+Afterwards, we performed a k-fold cross validation (CV) for examining each lambda via function `LambdaTuning`, the metrics which including area under curve of Precision Recall Curve (PRC), Matthews Correlation Coefficient (MCC), minimal error and minimal Binary Cross Entropy loss (BCE) were evaluate in each examining lambda. Since this procedure is time consuming, we suggest running it with `nohup`, and we provide a `outdir` option to save the results to the folder you specify.
 
-`lambda_tuning(X_input, X_raw, Y, lmbdrange, k_fold, outdir, device='cpu', training_echo=False, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8)` 
+`LambdaTuning(X_input, X_raw, Y, lmbdrange, k_fold, outdir, device='cpu', training_echo=False, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8)` 
 
 |                 |                                                                    |
 |-----------------|--------------------------------------------------------------------|
 | **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **lmbdrange : *np-array of shape (n_steps,)*** <br>  examining lambda vector. <br> <br> **k_fold : *Integer*** <br> split data into k parts for cross validation. <br> <br>  **outdir : *String*** <br>  Absolute-path of output folder  <br> <br> **other prarameters : the basic seting in `PreLect` class**  |
 | **Returns:**    | **metrics_dict : *Dict*** <br>  {'Percentage', 'Prevalence', 'Feature_number', 'AUC', 'AUPR', 'MCC', 'loss_history', 'error_history', 'pairwiseMCC'}. |
 
-As mentioned above, we also provide a function `get_tuning_result` to get the result from output folder, if you conduct `lambda_tuning` via `nohup`.
+As mentioned above, we also provide a function `get_tuning_result` to get the result from output folder, if you conduct `LambdaTuningViz` via `nohup`.
 
 `get_tuning_result(result_path)`
 
@@ -271,7 +271,7 @@ As mentioned above, we also provide a function `get_tuning_result` to get the re
 
 #### Examples
 ```python
->>> log_lmbd_range = auto_scale(Data_std, RawData, Label, step=50)
+>>> log_lmbd_range = AutoScanning(Data_std, RawData, Label, step=50)
 
 >>> lmbd_range = np.exp(log_lmbd_range)
 >>> print(lmbd_range)
@@ -291,13 +291,13 @@ array([1.00000000e-08, 1.26485522e-08, 1.59985872e-08, 2.02358965e-08,
 
 >>> k_fold = 5
 >>> outPath_dataSet = '/home/yincheng23/PreLect/data/crc_zeller/LmbdTuning'
->>> result_dict =lambda_tuning(Data_std, RawData, Label, lmbd_range, k_fold, outPath_dataSet)
+>>> result_dict =LambdaTuning(Data_std, RawData, Label, lmbd_range, k_fold, outPath_dataSet)
 # check here https://github.com/YinchengChen23/PreLect/blob/main/data/crc_zeller/LmbdTuning
 
 >>> result_dict_recell = get_tuning_result(outPath_dataSet)
 ```
 
-We provided user-friendly visualization function `lambda_tuning_viz` to assist you for viewing the results, 9 measurements were tested in each lambda, a detailed description is provided below.
+We provided user-friendly visualization function `LambdaTuningViz` to assist you for viewing the results, 9 measurements were tested in each lambda, a detailed description is provided below.
 
 - Percentage : Percentage of features were selected in each lambda.
 - Prevalence : The medium value of selected features prevalence in each lambda.
@@ -308,34 +308,34 @@ We provided user-friendly visualization function `lambda_tuning_viz` to assist y
 
 We also retrain a logistic classifier with the selected features, and test it with `AUC`, `AUPR` and `MCC`. mean and standard deviation in k-fold CV.
 
-`lambda_tuning_viz(result_dict, metric, savepath=None, fig_width=8, fig_height=4)`
+`LambdaTuningViz(result_dict, metric, savepath=None, fig_width=8, fig_height=4)`
 
 |                 |                                                                      |
 |-----------------|----------------------------------------------------------------------|
-| **Parameters:** | **result_dict : *Dict*** <br> The output of `lambda_tuning` or `get_tuning_result` function which including 9 measurements for each examining lambda. <br><br> **metric : *String*** <br>{`'Percentage'`, `'Prevalence'`, `'Feature_number'`, `'AUC'`, `'AUPR'`, `'MCC'`, `'loss_history'`, `'error_history'`, `'pairwiseMCC'`} <br> chose one you want to check. <br><br> **savepath (optional) : *String, absolute-path*** <br> you can assign a path to save the figure  <br><br> |
+| **Parameters:** | **result_dict : *Dict*** <br> The output of `LambdaTuning` or `get_tuning_result` function which including 9 measurements for each examining lambda. <br><br> **metric : *String*** <br>{`'Percentage'`, `'Prevalence'`, `'Feature_number'`, `'AUC'`, `'AUPR'`, `'MCC'`, `'loss_history'`, `'error_history'`, `'pairwiseMCC'`} <br> chose one you want to check. <br><br> **savepath (optional) : *String, absolute-path*** <br> you can assign a path to save the figure  <br><br> |
 | **Returns:**    | **Fig : *matplotlib.figure object***                                 |
 
 #### Examples
 
-`Fig = lambda_tuning_viz(result_dict_recell, 'Feature_number')`
+`Fig = LambdaTuningViz(result_dict_recell, 'Feature_number')`
 ![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img2.png?raw=true)
 
-`Fig = lambda_tuning_viz(result_dict_recell, 'AUC')`
+`Fig = LambdaTuningViz(result_dict_recell, 'AUC')`
 ![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img3.png?raw=true)
 
-`Fig = lambda_tuning_viz(result_dict_recell, 'loss_history')`
+`Fig = LambdaTuningViz(result_dict_recell, 'loss_history')`
 ![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img4.png?raw=true)
 
-`Fig = lambda_tuning_viz(result_dict_recell, 'error_history')`
+`Fig = LambdaTuningViz(result_dict_recell, 'error_history')`
 ![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img5.png?raw=true)
 
 ```python
 # You can save the figure via
 >>> outputPath = '/home/yincheng23/PreLect/img/img2.png'
->>> Fig = lambda_tuning_viz(result_dict_recell, 'Feature_number', outputPath)
+>>> Fig = LambdaTuningViz(result_dict_recell, 'Feature_number', outputPath)
 
 #or
->>> Fig = lambda_tuning_viz(result_dict_recell, 'Feature_number')
+>>> Fig = LambdaTuningViz(result_dict_recell, 'Feature_number')
 >>> Fig.savefig(outputPath)
 ```
 
@@ -345,7 +345,7 @@ We recommend determining the optimal lambda value based on the inflection point 
 
 |                 |                                                                      |
 |-----------------|----------------------------------------------------------------------|
-| **Parameters:** | **result_dict : *Dict*** <br> The output of `lambda_tuning` or `get_tuning_result` function which including 9 measurements for each examining lambda. <br><br> **k : *Integer*** <br> Decide n_segments to divide. <br><br> **savepath (optional) : *String, absolute-path*** <br> you can assign a path to save the figure  <br><br> |
+| **Parameters:** | **result_dict : *Dict*** <br> The output of `LambdaTuning` or `get_tuning_result` function which including 9 measurements for each examining lambda. <br><br> **k : *Integer*** <br> Decide n_segments to divide. <br><br> **savepath (optional) : *String, absolute-path*** <br> you can assign a path to save the figure  <br><br> |
 | **Returns:**    |  **selected_lambda : *Float*** <br> Final lambda. <br><br> **Fig : *matplotlib.figure object*** |
 
 ```python
