@@ -1,4 +1,4 @@
-# **Adapted LASSO : A Robust Approach for Feature Engineering in Sparse Matrices**
+# **PreLect : A Robust Approach for Feature Engineering in Sparse Matrices**
 
 
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
@@ -18,19 +18,19 @@ Table of Contents
 
   [Pytorch](https://pytorch.org/) is essential, please install it first.
 
-  Install ADlasso via package clone from GitHub repository.
+  Install PreLect via package clone from GitHub repository.
 
 ```Shell
-$ git clone https://github.com/YinchengChen23/ADlasso
-$ cd ADlasso
+$ git clone https://github.com/YinchengChen23/PreLect
+$ cd PreLect
 $ pip install . 
 ```
 
 ## General usage
-ADlasso is a classifier based on logistic regression with an *11*-like penalty, designed with a scikit-learn-like API. We can set the parameters using the `ADlasso` class and use the built-in function `.fit()` to fit the model to the training data. Eventually, the selection results are presented in the `.feature_set` and `.feature_sort` attributes.
+PreLect is a classifier based on logistic regression with an *11*-like penalty, designed with a scikit-learn-like API. We can set the parameters using the `PreLect` class and use the built-in function `.fit()` to fit the model to the training data. Eventually, the selection results are presented in the `.feature_set` and `.feature_sort` attributes.
 
 ```python
-class ADlasso(lmbd=1e-5, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8,
+class PreLect(lmbd=1e-5, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8,
               device='cpu', echo=False)
 ```
 
@@ -64,12 +64,12 @@ class ADlasso(lmbd=1e-5, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=
 >>> import scipy
 >>> import numpy as np
 >>> import pandas as pd
->>> import ADlasso
->>> from ADlasso.AD_utils import *
+>>> import PreLect
+>>> from PreLect.PL_utils import *
 
->>> url_1 = 'https://raw.githubusercontent.com/YinchengChen23/ADlasso/main/data/crc_zeller/ASV_vst.txt'
->>> url_2 = 'https://raw.githubusercontent.com/YinchengChen23/ADlasso/main/data/crc_zeller/ASV_table.txt'
->>> url_3 = 'https://raw.githubusercontent.com/YinchengChen23/ADlasso/main/data/crc_zeller/metadata.txt'
+>>> url_1 = 'https://raw.githubusercontent.com/YinchengChen23/PreLect/main/data/crc_zeller/ASV_vst.txt'
+>>> url_2 = 'https://raw.githubusercontent.com/YinchengChen23/PreLect/main/data/crc_zeller/ASV_table.txt'
+>>> url_3 = 'https://raw.githubusercontent.com/YinchengChen23/PreLect/main/data/crc_zeller/metadata.txt'
 >>> Data = pd.read_csv(url_1, sep = "\t"); Data = Data.T           # Variance-stabilizing transformation was conducted by DESeq2
 >>> Data_std = scipy.stats.zscore(Data, axis=0, ddof=0)            # we using z-normalization data as input-data
 >>> RawData = pd.read_csv(url_2, sep = "\t"); RawData = RawData.T  # Raw count data, was used as an assessment of prevalence
@@ -84,7 +84,7 @@ This data contains 129 samples and 6661 features
 
 
 >>> pvl = get_prevalence(RawData, np.arange(RawData.shape[0]))
->>> res = ADlasso(lmbd = 1e-6, echo= True)
+>>> res = PreLect(lmbd = 1e-6, echo= True)
 >>> start = time.time()
 >>> res.fit(Data_std, Label, pvl)
 minimum epoch =  9999 ; minimum lost =  6.27363842795603e-05 ; diff weight =  0.002454951871186495
@@ -113,18 +113,18 @@ ASV00144 0.6585081
 .
 
 #Export selection result
->>> res.writeList('/home/yincheng23/ADlasso/data/crc_zeller/selectedList.txt', Data_std.columns)
-# check here https://github.com/YinchengChen23/ADlasso/blob/main/data/crc_zeller/selectedList.txt
+>>> res.writeList('/home/yincheng23/PreLect/data/crc_zeller/selectedList.txt', Data_std.columns)
+# check here https://github.com/YinchengChen23/PreLect/blob/main/data/crc_zeller/selectedList.txt
 
 
 
 
-# We also can do the split training and testing with ADlasso
+# We also can do the split training and testing with PreLect
 >>> from sklearn.model_selection import train_test_split
 >>> train_X, test_X, train_y, test_y = train_test_split(Data_std, Label, test_size=0.2)
 >>> train_ix = np.array([ix for ix, sample in enumerate(Data_std.index) if sample in train_X.index])
 >>> pvl = get_prevalence(RawData, train_ix)
->>> res = ADlasso(lmbd = 1e-6, echo= True)
+>>> res = PreLect(lmbd = 1e-6, echo= True)
 >>> res.fit(train_X, train_y, pvl)
 >>> print('median of prevalence :',np.median([pvl[i]  for i, w in enumerate(res.feature_set) if w != 0]))
 median of prevalence : 0.2815533980582524
@@ -154,20 +154,20 @@ total selected feature : 568
 >>> ax.set_ylabel('Precision')
 >>> ax.set_xlabel('Recall')
 >>> plt.show()
-# You may notice that the accuracy of ADlasso is not very high as
+# You may notice that the accuracy of PreLect is not very high as
 # it is a feature selector rather than a classifier.
 ```
 <br>
 
 > **WARNING**
-> Since ADlasso has not yet been established as a full scikit-learn API, so in the process of using it, you must first declare a class before doing the fit, you cannot do the fit directly.
+> Since PreLect has not yet been established as a full scikit-learn API, so in the process of using it, you must first declare a class before doing the fit, you cannot do the fit directly.
 
 
 ```python
 # Wrong way
->>> res = ADlasso(lmbd=1e-5).fit(train_X, train_y, pvl_vec) 
+>>> res = PreLect(lmbd=1e-5).fit(train_X, train_y, pvl_vec) 
 # Correct way
->>> res = ADlasso(lmbd=1e-5)
+>>> res = PreLect(lmbd=1e-5)
 >>> res.fit(train_X, train_y, pvl_vec)
 ```
 #### Methods
@@ -241,14 +241,14 @@ Automatically generates a list of feature selections.
 ## Lambda tuning
 
 Unlike the common strategies for parameters tuning (based on performance), Here, we propose a method to determine the parameter according to the variation of loss value. We observe that the number of selected features gradually decreases as lambda intensity from weak to strong, as shown below.
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img1.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img1.png?raw=true)
 So we design a function `auto_scale` which can automatically scan the lambda from $10^{-10}$ to $1$, and identify the upper and lower boundaries representing lasso start filtering and lasso drop all features respectively (black dotted line). And divide `k` parts whitin this region as the examining lambdas.
 
 `auto_scale(X_input, X_raw, Y, step=50, device='cpu', training_echo=False, max_iter=10000, tol=1e-4, lr=0.001, alpha=0.9, epsilon=1e-8)`
 
 |                 |                                                                    |
 |-----------------|--------------------------------------------------------------------|
-| **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **step : *Integer*** <br> split into k parts within upper and lower bounds as examining lambda.  <br> <br> **other prarameters : the basic seting in `ADlasso` class**  |
+| **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **step : *Integer*** <br> split into k parts within upper and lower bounds as examining lambda.  <br> <br> **other prarameters : the basic seting in `PreLect` class**  |
 | **Returns:**    | **log_lmbd_range : *np-array of shape (n_steps,)*** <br> The vector of examining lambda. |
 
 Afterwards, we performed a k-fold cross validation (CV) for examining each lambda via function `lambda_tuning`, the metrics which including area under curve of Precision Recall Curve (PRC), Matthews Correlation Coefficient (MCC), minimal error and minimal Binary Cross Entropy loss (BCE) were evaluate in each examining lambda. Since this procedure is time consuming, we suggest running it with `nohup`, and we provide a `outdir` option to save the results to the folder you specify.
@@ -257,7 +257,7 @@ Afterwards, we performed a k-fold cross validation (CV) for examining each lambd
 
 |                 |                                                                    |
 |-----------------|--------------------------------------------------------------------|
-| **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **lmbdrange : *np-array of shape (n_steps,)*** <br>  examining lambda vector. <br> <br> **k_fold : *Integer*** <br> split data into k parts for cross validation. <br> <br>  **outdir : *String*** <br>  Absolute-path of output folder  <br> <br> **other prarameters : the basic seting in `ADlasso` class**  |
+| **Parameters:** | **X_input : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>  The normalized or transformed data for providing feature space.  <br> <br> **X_raw : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br>   The original, count data for calculating prevalence in each feature. <br> <br> **Y : *{list or np-array} of shape (n_samples, )*** <br> Target vector relative to X_input. <br> <br> **lmbdrange : *np-array of shape (n_steps,)*** <br>  examining lambda vector. <br> <br> **k_fold : *Integer*** <br> split data into k parts for cross validation. <br> <br>  **outdir : *String*** <br>  Absolute-path of output folder  <br> <br> **other prarameters : the basic seting in `PreLect` class**  |
 | **Returns:**    | **metrics_dict : *Dict*** <br>  {'Percentage', 'Prevalence', 'Feature_number', 'AUC', 'AUPR', 'MCC', 'loss_history', 'error_history', 'pairwiseMCC'}. |
 
 As mentioned above, we also provide a function `get_tuning_result` to get the result from output folder, if you conduct `lambda_tuning` via `nohup`.
@@ -290,9 +290,9 @@ array([1.00000000e-08, 1.26485522e-08, 1.59985872e-08, 2.02358965e-08,
        7.90604321e-04, 1.00000000e-03])
 
 >>> k_fold = 5
->>> outPath_dataSet = '/home/yincheng23/ADlasso/data/crc_zeller/LmbdTuning'
+>>> outPath_dataSet = '/home/yincheng23/PreLect/data/crc_zeller/LmbdTuning'
 >>> result_dict =lambda_tuning(Data_std, RawData, Label, lmbd_range, k_fold, outPath_dataSet)
-# check here https://github.com/YinchengChen23/ADlasso/blob/main/data/crc_zeller/LmbdTuning
+# check here https://github.com/YinchengChen23/PreLect/blob/main/data/crc_zeller/LmbdTuning
 
 >>> result_dict_recell = get_tuning_result(outPath_dataSet)
 ```
@@ -302,7 +302,7 @@ We provided user-friendly visualization function `lambda_tuning_viz` to assist y
 - Percentage : Percentage of features were selected in each lambda.
 - Prevalence : The medium value of selected features prevalence in each lambda.
 - Feature_number : The number of selected features in each lambda.
-- loss_history : The minimum loss value of adapted Lasso after training.
+- loss_history : The minimum loss value of PreLect after training.
 - error_history : The minimum iteration difference after training.
 - pairwiseMCC : Compare Matthews correlation coefficient of selected feature within k-fold CV.
 
@@ -318,20 +318,20 @@ We also retrain a logistic classifier with the selected features, and test it wi
 #### Examples
 
 `Fig = lambda_tuning_viz(result_dict_recell, 'Feature_number')`
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img2.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img2.png?raw=true)
 
 `Fig = lambda_tuning_viz(result_dict_recell, 'AUC')`
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img3.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img3.png?raw=true)
 
 `Fig = lambda_tuning_viz(result_dict_recell, 'loss_history')`
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img4.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img4.png?raw=true)
 
 `Fig = lambda_tuning_viz(result_dict_recell, 'error_history')`
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img5.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img5.png?raw=true)
 
 ```python
 # You can save the figure via
->>> outputPath = '/home/yincheng23/ADlasso/img/img2.png'
+>>> outputPath = '/home/yincheng23/PreLect/img/img2.png'
 >>> Fig = lambda_tuning_viz(result_dict_recell, 'Feature_number', outputPath)
 
 #or
@@ -349,13 +349,13 @@ We recommend determining the optimal lambda value based on the inflection point 
 | **Returns:**    |  **selected_lambda : *Float*** <br> Final lambda. <br><br> **Fig : *matplotlib.figure object*** |
 
 ```python
->>> outputPath = '/home/yincheng23/ADlasso/img/img2.png'
+>>> outputPath = '/home/yincheng23/PreLect/img/img2.png'
 >>> opt_lmbd, fig = lambda_decision(result_dict_recell, 5)
 >>> print(opt_lmbd)
 1.4563484775012424e-05
 
 >>> pvl = get_prevalence(RawData, np.arange(RawData.shape[0]))
->>> opt_res = ADlasso(lmbd = opt_lmbd, echo= True)
+>>> opt_res = PreLect(lmbd = opt_lmbd, echo= True)
 >>> start = time.time()
 >>> opt_res.fit(Data_std, Label, pvl)
 minimum epoch =  9999 ; minimum lost =  0.00022168313444126397 ; diff weight =  0.002862341469153762
@@ -369,28 +369,28 @@ total selected feature : 226
 >>> print("Total cost：%f sec" % (end - start))
 Total cost：2.382093 sec
 ```
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img6.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img6.png?raw=true)
 
 ## Selection profile
-To examine the goodness of selected feature set by ADlasso, we designed a function `evaluation` to test distinguishment the selected feature set with the classifier which usr-assignment.
+To examine the goodness of selected feature set by PreLect, we designed a function `evaluation` to test distinguishment the selected feature set with the classifier which usr-assignment.
 
-`evaluation(x_train, y_train, x_test, y_test, AD_object, classifier)`
+`evaluation(x_train, y_train, x_test, y_test, PL_object, classifier)`
 
 |                 |                                                                    |
 |-----------------|--------------------------------------------------------------------|
-| **Parameters:** | **x_train : *{np-array or sparse matrix} of shape (n_samples, n_features)*** <br> Training dataset.  <br><br> **y_train : *np-array of shape (n_samples, )*** <br> Training label vector. <br><br> **x_test : *{np-array or sparse matrix} of shape (n_samples, n_features)*** <br> Testing dataset.  <br><br> **y_test : *np-array of shape (n_samples, )*** <br> Testing label vector. <br><br> **AD_object : *ADlasso class*** <br> The ADlasso object which trained with optimized lambda. <br><br> **classifier : *scikit-learn classifier***. <br> A parameterized scikit-learn estimators for examine the performance of feature set selected by ADlasso. |
+| **Parameters:** | **x_train : *{np-array or sparse matrix} of shape (n_samples, n_features)*** <br> Training dataset.  <br><br> **y_train : *np-array of shape (n_samples, )*** <br> Training label vector. <br><br> **x_test : *{np-array or sparse matrix} of shape (n_samples, n_features)*** <br> Testing dataset.  <br><br> **y_test : *np-array of shape (n_samples, )*** <br> Testing label vector. <br><br> **PL_object : *PreLect class*** <br> The PreLect object which trained with optimized lambda. <br><br> **classifier : *scikit-learn classifier***. <br> A parameterized scikit-learn estimators for examine the performance of feature set selected by PreLect. |
 | **Returns:**    | **metrics_dict : *Dict*** <br> A dict of performance measurement {AUC, AUPR, MCC} |
 
-We also developed a function `featureProperty` to get the properties of each features. The user can check the characteristics of the features selected by ADlasso.  
+We also developed a function `featureProperty` to get the properties of each features. The user can check the characteristics of the features selected by PreLect.  
 
-`featureProperty(X, y, AD_object)`
+`featureProperty(X, y, PL_object)`
 
 |                 |                                                                    |
 |-----------------|--------------------------------------------------------------------|
-| **Parameters:** | **X : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br> Raw count data. <br><br> y : *{list or np-array} of shape (n_samples, )*** <br> label vector relative to X. <br><br> **AD_object : *ADlasso class*** <br> The ADlasso object which trained with optimized lambda.         |
+| **Parameters:** | **X : *{pd-dataframe, np-array or sparse matrix} of shape (n_samples, n_features)*** <br> Raw count data. <br><br> y : *{list or np-array} of shape (n_samples, )*** <br> label vector relative to X. <br><br> **PL_object : *PreLect class*** <br> The PreLect object which trained with optimized lambda.         |
 | **Returns:**    | **plotdf : *pd-dataframe*** <br> The feature property table.       |
 
-featureProperty(X, y, AD_object):
+featureProperty(X, y, PL_object):
 
 ``` python
 >>> from sklearn.linear_model import LogisticRegression
@@ -422,7 +422,7 @@ RandomForest : {'AUC': 0.6165413533834586, 'AUPR': 0.8369912351422049, 'MCC': 0.
 >>> Prop['featureID'] = Data_std.columns
 >>> Prop
 ```
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img7.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img7.png?raw=true)
 
 ```python
 import matplotlib.pyplot as plt
@@ -431,29 +431,29 @@ import seaborn as sns
 g =sns.scatterplot(x="meanAbundance", y="Variance", hue="select",palette=['r', 'b'], alpha = 0.5, data=Prop)
 g.set(yscale="log")
 ```
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img8.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img8.png?raw=true)
 
 ```python
 g =sns.scatterplot(x="prevalence", y="Variance", hue="select", palette=['r', 'b'], alpha = 0.5, data=Prop)
 g.set(yscale="log")
 ```
 
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img9.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img9.png?raw=true)
 
 ```python
 g =sns.scatterplot(x="prevalence_Cancer", y="prevalence_Normal", hue="select", palette=['r', 'b'], data=Prop)
 ```
 
-![alt](https://github.com/YinchengChen23/ADlasso/blob/main/img/img10.png?raw=true)
+![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img10.png?raw=true)
 
 ## Citing Resources
 coming soon
 
 ## Authors
-The following individuals have contributed code to ADlass:
+The following individuals have contributed code to PreLect:
 - Yin Cheng, Chen
 - Ming Fong, Wu
 
 ## Found a Bug
 Or would like a feature added? Or maybe drop some feedback?
-Just [open a new issue](https://github.com/YinchengChen23/ADlasso/issues/new) or send an email to us (yin.cheng.23@gmail.com).
+Just [open a new issue](https://github.com/YinchengChen23/PreLect/issues/new) or send an email to us (yin.cheng.23@gmail.com).
