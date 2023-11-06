@@ -141,7 +141,7 @@ def AutoScanning(X_input, X_raw, Y, step=50, device='cpu', training_echo=False,
         
     if device == 'cuda':
         if not torch.cuda.is_available():
-            print("your GPU is not available, PreLect is running with CPU.")
+            ("your GPU is not available, PreLect is running with CPU.")
             device= 'cpu'
 
     y = np.array([0 if yi == class_content[0] else 1 for yi in Y])
@@ -182,7 +182,7 @@ def LambdaTuning(X_input, X_raw, Y, lmbdrange, k_fold, outdir, device='cpu', tra
     
     if device == 'cuda':
         if not torch.cuda.is_available():
-            print("your GPU is not available, PreLect is running with CPU.")
+            ("your GPU is not available, PreLect is running with CPU.")
             device= 'cpu'
 
     if os.path.exists(outdir) == False :
@@ -217,7 +217,6 @@ def LambdaTuning(X_input, X_raw, Y, lmbdrange, k_fold, outdir, device='cpu', tra
             lambd = lmbdrange[i]
             examined_lambda = PreLect(lmbd = lambd, device = device, echo = training_echo, max_iter=max_iter, tol=tol, lr=lr, alpha=alpha, epsilon=epsilon)
             examined_lambda.fit(train_X, train_y, train_pvl)
-            print(examined_lambda.n_iter_)
             selected_set = examined_lambda.feature_set
             Z[i, kcount, :] = selected_set
             metrics_dict['loss_history'][i,kcount] = examined_lambda.loss_
