@@ -323,5 +323,5 @@ class PreLect():
             if wi != 0:
                 featureID = featureNameList[ix] if featureNameList is not None else ix
                 tendency = classes[0] if wi < 0 else classes[1]
-                w.writelines(featureID + "\t" + str(wi) + "\t" + tendency + '\n')
+                w.writelines(featureID + "\t" + str(wi) + "\t" + str(tendency) + '\n')
         w.close()
