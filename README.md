@@ -447,6 +447,7 @@ g =sns.scatterplot(x="prevalence_Cancer", y="prevalence_Normal", hue="select", p
 
 ## License
 This code is made available under the CC BY-NC 4.0 license for non-commercial research applications.
+For more details, see the [LICENSE](./LICENSE) file.
 
 ## Citing Resources
 coming soon
