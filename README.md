@@ -1,15 +1,13 @@
 # **PreLect : A Robust Approach for Feature Engineering in Sparse Matrices**
 
 
-[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
-
-
 Table of Contents
 ====================
 - [Installation](#installation)
 - [General usage](#general-usage)
 - [Lambda tuning](#lambda-tuning)
 - [Selection profile](#selection-profile)
+- [License](#license)
 - [Citing Resources](#citing-resources)
 - [Authors](#authors)
 - [Found a Bug](#found-a-bug)
@@ -446,13 +444,17 @@ g =sns.scatterplot(x="prevalence_Cancer", y="prevalence_Normal", hue="select", p
 
 ![alt](https://github.com/YinchengChen23/PreLect/blob/main/img/img10.png?raw=true)
 
+
+## License
+This code is made available under the CC BY-NC 4.0 license for non-commercial research applications.
+
 ## Citing Resources
 coming soon
 
 ## Authors
 The following individuals have contributed code to PreLect:
-- Yin Cheng, Chen
-- Ming Fong, Wu
+- Yin Cheng Chen
+- Ming Fong Wu
 
 ## Found a Bug
 Or would like a feature added? Or maybe drop some feedback?
